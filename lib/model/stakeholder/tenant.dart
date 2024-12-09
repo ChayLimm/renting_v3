@@ -2,12 +2,11 @@ class Tenant {
   int identity;
   int contact;
   double deposit;
-  int? rentsParking;
+  int rentsParking;
 
-  Tenant({
-    required this.identity,
-    required this.contact,
-    this.deposit = 0, 
-    this.rentsParking = 0
-  });
+  Tenant(
+      {required this.identity,
+      required this.contact,
+      this.deposit = 0,
+      this.rentsParking = 0});
 }

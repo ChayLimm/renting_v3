@@ -1,7 +1,8 @@
 
-import 'package:pos_renting_v3/model/payment/payment.dart';
-import 'package:pos_renting_v3/model/stakeholder/landlord.dart';
-import 'package:pos_renting_v3/model/stakeholder/tenant.dart';
+import '../payment/payment.dart';
+import '../stakeholder/landlord.dart';
+import '../stakeholder/tenant.dart';
+
 
 enum RoomAvailability{
   available,
@@ -12,7 +13,7 @@ enum RoomAvailability{
 class Room {
   String roomName; 
   double roomPrice;
-  List<Payment>? paymentList;
+  List<Payment> paymentList = [ ];
   LandLord landlord;
   Tenant? tenant;
 
@@ -20,7 +21,6 @@ class Room {
     required this.roomName, 
     required this.roomPrice, 
     required this.landlord, 
-    this.paymentList, 
     this.tenant, 
     });
 
