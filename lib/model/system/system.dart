@@ -18,8 +18,7 @@ class System {
     return null;
   }
 
-  void processPayment(Room room, DateTime datetime, double inputWater,
-      double inputElectricity) {
+  void processPayment(Room room, DateTime datetime, double inputWater,double inputElectricity) {
     // Check for a valid price charge
     PriceCharge? priceCharge = getValidPriceCharge(datetime);
     if (priceCharge == null) {
@@ -89,7 +88,7 @@ class System {
   }
 
 //calculate the room price considering the deposit
-  double _getRoomPriceForPayment(Tenant tenant, Room room) {
+  double _getRoomPriceForPayment( Tenant tenant, Room room) {
     return tenant.deposit < room.roomPrice
         ? room.roomPrice + (room.roomPrice - tenant.deposit)
         : room.roomPrice;

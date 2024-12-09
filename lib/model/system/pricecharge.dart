@@ -20,8 +20,10 @@ class PriceCharge {
 
   bool isValidDate(DateTime datetime) {
     if (endDate == null) {
+      // print('enddate null checked');
       return datetime.isAfter(startDate);
     }
+    // print('enddate null NOT checked');
     return datetime.isAfter(startDate) && datetime.isBefore(endDate!);
   }
   
