@@ -108,9 +108,9 @@ class System {
   }
 
 //payment list cant be update
-  updateRoom(Room room, Room updateRoom) {
+  updateRoom(Room updateRoom) {
     for (var item in roomList) {
-      if (item.roomName == room.roomName) {
+      if (item.roomName == updateRoom.roomName) {
         item.roomPrice = updateRoom.roomPrice;
         item.roomName = updateRoom.roomName;
         item.tenant = updateRoom.tenant;

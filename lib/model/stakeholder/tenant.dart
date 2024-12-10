@@ -1,6 +1,6 @@
 class Tenant {
   int identity;
-  int contact;
+  String contact;
   double deposit;
   int rentsParking;
 

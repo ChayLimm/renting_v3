@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_renting_v3/model/payment/payment.dart';
 import 'package:pos_renting_v3/model/room/room.dart';
+import 'package:pos_renting_v3/screen/homepage/roomList.dart';
 import 'package:pos_renting_v3/screen/homepage/status_widget.dart';
 import 'package:pos_renting_v3/utils/component.dart';
 
@@ -87,17 +88,19 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
+        child: 
+           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               StatusWidget(available: available.length,paid: paid.length,unpaid: unpaid.length,pending: pending.length,),
               const SizedBox(height: 24,),
               label("Room"),
+              const SizedBox(height: 16,),
+              Expanded(child: RoomListView(roomList: widget.roomList,))
             ],
           ),
         ),
-        ),
+        
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:pos_renting_v3/model/stakeholder/tenant.dart';
 import 'package:pos_renting_v3/model/system/system.dart';
 import 'screen/homepage/main.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,11 @@ void main() {
   system1.addRoom(room4,100,100);
   system1.addRoom(room5,100,100);
   system1.addRoom(room6,100,100);
+
+  Tenant tenant1 = Tenant(contact: "165498",identity: 13213, rentsParking: 1,deposit: 50);
+
+  system1.manageTenant(room1, tenant1);
+  system1.processPayment(room1, DateTime.now(), 200, 200);
  
   runApp(MainApp(system: system1,));
 }

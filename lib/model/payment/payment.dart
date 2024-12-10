@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import '../payment/consumption.dart';
 import '../room/room.dart';
 import '../stakeholder/landlord.dart';
@@ -5,9 +7,12 @@ import '../stakeholder/tenant.dart';
 import '../system/pricecharge.dart';
 
 enum  PaymentStatus{
-  unpaid,
-  pending,
-  paid,
+  unpaid(Color(0xFFFF0000)),
+  pending(Color(0xFFF8A849)),
+  paid(Color(0xFF4FAC80));
+
+  final Color color;
+  const PaymentStatus(this.color);
 }
 
 class Payment {
