@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import '../payment/consumption.dart';
 import '../room/room.dart';
 import '../stakeholder/landlord.dart';
@@ -7,9 +8,10 @@ import '../stakeholder/tenant.dart';
 import '../system/pricecharge.dart';
 
 enum  PaymentStatus{
-  unpaid(Color(0xFFFF0000)),
+  unpaid(Color(0xFFEC5665)),
   pending(Color(0xFFF8A849)),
-  paid(Color(0xFF4FAC80));
+  paid(Color(0xFF4FAC80)),
+  available(Color(0xFFF2F2F8));
 
   final Color color;
   const PaymentStatus(this.color);

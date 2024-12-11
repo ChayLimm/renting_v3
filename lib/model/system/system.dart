@@ -6,8 +6,12 @@ import 'pricecharge.dart';
 import 'report.dart';
 
 class System {
-  List<PriceCharge> priceChargeList = [];
-  List<Room> roomList = [];
+  List<PriceCharge> priceChargeList;
+  List<Room> roomList;
+
+  // Constructor with optional parameters (defaulting to empty lists)
+  System({required this.priceChargeList,required this.roomList});
+
 
   PriceCharge? getValidPriceCharge(DateTime datetime) {
     for(var item in priceChargeList){
@@ -16,6 +20,14 @@ class System {
       }
     }
     return null;
+  }
+  Payment? getPaymentThisMonth(Room room, [DateTime? dateTime] ){
+    dateTime ??= DateTime.now();
+    return  room.paymentList.isNotEmpty &&
+            room.paymentList.last.timestamp.month == dateTime.month &&
+            room.paymentList.last.timestamp.year == dateTime.year
+        ? room.paymentList.last
+        : null;
   }
 
   void processPayment(Room room, DateTime datetime, double inputWater,double inputElectricity) {

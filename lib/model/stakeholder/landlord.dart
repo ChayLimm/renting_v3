@@ -1,5 +1,5 @@
 
 class LandLord{
-  int contact;
+  String contact;
   LandLord({required this.contact});
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos_renting_v3/model/payment/payment.dart';
 import 'package:pos_renting_v3/utils/component.dart';
 
 class StatusWidget extends StatelessWidget {
@@ -6,17 +7,19 @@ class StatusWidget extends StatelessWidget {
   final int unpaid;
   final int pending;
   final int paid;
+  final Function(PaymentStatus) selectedGroupBy;
   const StatusWidget(
       {super.key,
       required this.available,
       required this.unpaid,
       required this.pending,
-      required this.paid});
+      required this.paid,
+      required this.selectedGroupBy
+      });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 320,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
@@ -27,22 +30,26 @@ class StatusWidget extends StatelessWidget {
           BuildStatusBox(
             title: "Available",
             number: available,
-            color: Theme.of(context).scaffoldBackgroundColor,
+            selectedGroupBy : selectedGroupBy,
+            status: PaymentStatus.available
           ),
           BuildStatusBox(
             title: "Unpaid",
             number: unpaid,
-            color: red,
+            selectedGroupBy : selectedGroupBy,
+            status: PaymentStatus.unpaid
           ),
           BuildStatusBox(
             title: "Pending",
             number: pending,
-            color: yellow,
+            selectedGroupBy : selectedGroupBy,
+            status: PaymentStatus.pending
           ),
           BuildStatusBox(
             title: "Paid",
             number: paid,
-            color: green,
+            selectedGroupBy : selectedGroupBy,
+            status: PaymentStatus.paid
           )
         ],
       ),
@@ -53,49 +60,56 @@ class StatusWidget extends StatelessWidget {
 class BuildStatusBox extends StatelessWidget {
   final String title;
   final int number;
-  final Color color;
+  final PaymentStatus status;
+  final Function(PaymentStatus) selectedGroupBy;
+
   const BuildStatusBox(
       {super.key,
       required this.title,
       required this.number,
-      required this.color});
+      required this.status,
+      required this.selectedGroupBy
+      });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: Container(
-      padding: const EdgeInsets.all(4),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            height: 64,
-            width: 64,
-            decoration: BoxDecoration(
-                color: color, borderRadius: BorderRadius.circular(8)),
-            child: Center(
-              child: Text(
-                number.toString(),
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                    color: color == Theme.of(context).scaffoldBackgroundColor
-                        ? Colors.black
-                        : Colors.white),
+        child: InkWell(
+          onTap: ()=> selectedGroupBy(status),
+          child: Container(
+                padding: const EdgeInsets.all(4),
+                child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: 64,
+              width: 64,
+              decoration: BoxDecoration(
+                  color: status.color, borderRadius: BorderRadius.circular(8)),
+              child: Center(
+                child: Text(
+                  number.toString(),
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                      color: status.color == Theme.of(context).scaffoldBackgroundColor
+                          ? Colors.black
+                          : Colors.white),
+                ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 4,
-          ),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12,
+            const SizedBox(
+              height: 4,
             ),
-          )
-        ],
-      ),
-    ));
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 12,
+              ),
+            )
+          ],
+                ),
+              ),
+        ));
   }
 }

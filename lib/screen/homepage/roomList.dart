@@ -1,53 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:pos_renting_v3/data/dummyData.dart';
 import 'package:pos_renting_v3/model/payment/payment.dart';
 import 'package:pos_renting_v3/model/room/room.dart';
+import 'package:pos_renting_v3/screen/room/main.dart';
+import 'package:pos_renting_v3/utils/device.dart';
 
-class RoomListView extends StatelessWidget {
+class RoomListView extends StatefulWidget {
   final List<Room> roomList;
   const RoomListView({super.key, required this.roomList});
 
   @override
+  State<RoomListView> createState() => _RoomListViewState();
+}
+
+class _RoomListViewState extends State<RoomListView> {
+  late List<bool> _isVisible;
+
+  @override
+  void initState() {
+    super.initState();
+    _resetAnimation();
+  }
+
+  @override
+  void didUpdateWidget(RoomListView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _resetAnimation(); // Reset animation on widget update.
+  }
+
+  void _resetAnimation() {
+    _isVisible = List.generate(widget.roomList.length, (_) => false);
+    _animateItems();
+  }
+
+  void _animateItems() {
+    for (int i = 0; i < widget.roomList.length; i++) {
+      Future.delayed(Duration(milliseconds: i * 50), () {
+        if (mounted) {
+          setState(() {
+            _isVisible[i] = true;
+          });
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      itemCount: roomList.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 5, 
-        mainAxisSpacing: 5, 
+      itemCount: widget.roomList.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: DeviceType.isMobile(context) ? 2 : 4,
+        crossAxisSpacing: 5,
+        mainAxisSpacing: 5,
         childAspectRatio: 3 / 1.5,
       ),
       itemBuilder: (context, index) {
-        return RoomCard(room: roomList[index]);
+        return AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: _isVisible[index] ? 1.0 : 0.0,
+          child: RoomCard(room: widget.roomList[index]),
+        );
       },
     );
   }
 }
+
 class RoomCard extends StatelessWidget {
   final Room room;
-  const RoomCard({super.key,required this.room});
+  const RoomCard({super.key, required this.room});
 
   @override
   Widget build(BuildContext context) {
+    final String subtitle = room.tenant?.contact ?? "None";
 
-    final String subtitle = room.tenant != null ? room.tenant!.contact : "None";
-    final Payment? payment = 
-          room.paymentList.last.timestamp.month == DateTime.now().month &&
-          room.paymentList.last.timestamp.year == DateTime.now().year ? 
-          room.paymentList.last : null ;
-    
+    // Check if the last payment is for the current month and year
+    final Payment? payment = system1.getPaymentThisMonth(room);
+
     return Card(
-      color: Colors.white, 
-      child:
-      ListTile(
-      leading: Icon(Icons.circle,color: payment != null ? payment.status.color : Colors.grey ,size: 20,),
-       title: Text(room.roomName,style: const TextStyle(
-        fontWeight: FontWeight.w500,
-        fontSize: 16
-       ),),
-       subtitle: Text(subtitle,style: const TextStyle(
-        fontSize: 12,
-        color: Colors.grey,
-       ),),
-    ));
+      color: room.tenant != null ? payment!.status.color : Colors.grey,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => RoomDetail(room: room)));
+        },
+        child: ListTile(
+          title: Text(
+            room.roomName,
+            style: const TextStyle(
+                fontWeight: FontWeight.w500, fontSize: 18, color: Colors.white),
+          ),
+          subtitle: Text(
+            subtitle,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
