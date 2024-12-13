@@ -5,6 +5,7 @@ import 'package:pos_renting_v3/model/room/room.dart';
 import 'package:pos_renting_v3/screen/homepage/roomList.dart';
 import 'package:pos_renting_v3/screen/homepage/status_widget.dart';
 import 'package:pos_renting_v3/utils/component.dart';
+import 'package:pos_renting_v3/data/dummyData.dart';
 
 class MyHomePage extends StatefulWidget {
   final List<Room> roomList;
@@ -30,30 +31,28 @@ class _MyHomePageState extends State<MyHomePage> {
       paid.clear();
 
       for (var room in widget.roomList) {
-        // Check if the room is available
-        if (room.getRoomAvailability() == RoomAvailability.available) {
+        Payment? lastPayment = system1.getPaymentThisMonth(room);
+
+        bool isAvailable = room.getRoomAvailability()== RoomAvailability.available; 
+        bool isUnpaid = lastPayment == null || lastPayment!.status == PaymentStatus.unpaid && room.getRoomAvailability() != RoomAvailability.available;
+        bool isPending = lastPayment == null || lastPayment!.status == PaymentStatus.pending && room.getRoomAvailability() != RoomAvailability.available;
+        bool isPaid = lastPayment == null || lastPayment!.status == PaymentStatus.paid && room.getRoomAvailability() != RoomAvailability.available;
+
+        if (isAvailable) {
           available.add(room);
-          continue;
-        }
-
-        if (room.paymentList.isNotEmpty) {
-          Payment lastPayment = room.paymentList.last;
-
-          if (lastPayment.timestamp.month == DateTime.now().month &&
-              lastPayment.timestamp.year == DateTime.now().year) {
-            if (lastPayment.status == PaymentStatus.paid) {
-              paid.add(room);
-            } else {
-              pending.add(room);
-            }
-          } else {
-            unpaid.add(room);
-          }
-        } else {
+        }if(isUnpaid){
           unpaid.add(room);
+        }else if(isPending){
+          pending.add(room);
+        }else if(isPaid){
+          paid.add(room);
         }
+
+      
+       
       }
-    });
+    }
+    );
   }
 
   void selectedGroupBy(PaymentStatus? sortBy) {
@@ -85,18 +84,12 @@ class _MyHomePageState extends State<MyHomePage> {
           passData.addAll(pending);
         });
         break;
-      case PaymentStatus.available:
+      case null:
         setState(() {
           passData.addAll(available);
           passData.addAll(unpaid);
           passData.addAll(pending);
           passData.addAll(paid);
-        });
-        break;
-      case null:
-        setState(() {
-          // Default to all rooms in roomList, can add ordering here if needed
-          passData.addAll(widget.roomList);
         });
         break;
     }

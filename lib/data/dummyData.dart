@@ -24,18 +24,28 @@ List<PriceCharge> priceCharge =
 
 // Create Rooms
 List<Room> roomList =
-[ Room(roomName: "A001", roomPrice: 100, landlord: landlord),
- Room(roomName: "A002", roomPrice: 100, landlord: landlord),
- Room(roomName: "A003", roomPrice: 110, landlord: landlord),
- Room(roomName: "A004", roomPrice: 110, landlord: landlord),
- Room(roomName: "A005", roomPrice: 120, landlord: landlord),
- Room(roomName: "A006", roomPrice: 120, landlord: landlord),];
+[ ];
 
+Room room1 = Room(roomName: "A001", roomPrice: 100, landlord: landlord);
+Room room2 = Room(roomName: "A002", roomPrice: 100, landlord: landlord);
+Room room3 = Room(roomName: "A003", roomPrice: 110, landlord: landlord);
+Room room4 = Room(roomName: "A004", roomPrice: 110, landlord: landlord);
+Room room5 = Room(roomName: "A005", roomPrice: 120, landlord: landlord);
+Room room6 = Room(roomName: "A006", roomPrice: 120, landlord: landlord);
 // Create System instance and add data
 System system1 = System(roomList: roomList,priceChargeList: priceCharge);
 
 
 Tenant tenant1 = Tenant(contact: "165498", identity: 13213, rentsParking: 1, deposit: 50);
+
+void initializeDummyData(){
+  system1.addRoom(room1, 100, 100);
+  system1.addRoom(room2, 100, 100);
+  system1.addRoom(room3, 100, 100);
+  system1.addRoom(room4, 100, 100);
+  system1.addRoom(room5, 100, 100);
+  system1.addRoom(room6, 100, 100);
+}
 
 // Tenant tenant1 = Tenant(contact: "165498", identity: 13213, rentsParking: 1, deposit: 50);
 

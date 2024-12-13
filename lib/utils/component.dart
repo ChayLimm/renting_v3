@@ -14,9 +14,10 @@ BoxShadow shadow() => BoxShadow(
       offset: const Offset(3, 3),
     );
 
-Text label(String label) => Text(
+Text label(String label,{Color color = Colors.black}) => Text(
       label,
-      style: const TextStyle(
+      style:  TextStyle(
+        color: color,
         fontSize: 16,
         fontWeight: FontWeight.w500,
       ),

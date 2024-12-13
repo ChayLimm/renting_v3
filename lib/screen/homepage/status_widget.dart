@@ -7,7 +7,7 @@ class StatusWidget extends StatelessWidget {
   final int unpaid;
   final int pending;
   final int paid;
-  final Function(PaymentStatus) selectedGroupBy;
+  final Function(PaymentStatus?) selectedGroupBy;
   const StatusWidget(
       {super.key,
       required this.available,
@@ -31,7 +31,7 @@ class StatusWidget extends StatelessWidget {
             title: "Available",
             number: available,
             selectedGroupBy : selectedGroupBy,
-            status: PaymentStatus.available
+            status: null
           ),
           BuildStatusBox(
             title: "Unpaid",
@@ -60,8 +60,8 @@ class StatusWidget extends StatelessWidget {
 class BuildStatusBox extends StatelessWidget {
   final String title;
   final int number;
-  final PaymentStatus status;
-  final Function(PaymentStatus) selectedGroupBy;
+  final PaymentStatus? status;
+  final Function(PaymentStatus?) selectedGroupBy;
 
   const BuildStatusBox(
       {super.key,
@@ -85,16 +85,14 @@ class BuildStatusBox extends StatelessWidget {
               height: 64,
               width: 64,
               decoration: BoxDecoration(
-                  color: status.color, borderRadius: BorderRadius.circular(8)),
+                  color: status == null ? Colors.grey : status?.color, borderRadius: BorderRadius.circular(8)),
               child: Center(
                 child: Text(
                   number.toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w500,
-                      color: status.color == Theme.of(context).scaffoldBackgroundColor
-                          ? Colors.black
-                          : Colors.white),
+                      color:Colors.white),
                 ),
               ),
             ),
