@@ -1,5 +1,6 @@
 class Tenant {
-  int identity;
+  final DateTime registerDate =  DateTime.now();
+  String identity;
   String contact;
   double deposit;
   int rentsParking;
@@ -8,5 +9,6 @@ class Tenant {
       {required this.identity,
       required this.contact,
       this.deposit = 0,
-      this.rentsParking = 0});
+      this.rentsParking = 0,
+  });
 }

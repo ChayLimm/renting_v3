@@ -65,8 +65,7 @@ class System {
     }
 
     // If there is a tenant and previous payment, process payment for the next month
-    Consumption consumption =
-        Consumption(waterMeter: inputWater, electricityMeter: inputElectricity);
+    Consumption consumption = Consumption(waterMeter: inputWater, electricityMeter: inputElectricity);
 
     if (inputWater < lastPayment.consumption.waterMeter ||
         inputElectricity < lastPayment.consumption.electricityMeter) {
@@ -78,7 +77,7 @@ class System {
     // Handle deposit update logic
     double roomPrice = _getRoomPriceForPayment(tenant, room);
     if (tenant.deposit < room.roomPrice) {
-      tenant.deposit = roomPrice;
+      tenant.deposit = room.roomPrice;
     }
 
     // Calculate the total price for the payment

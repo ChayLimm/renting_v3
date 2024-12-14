@@ -8,7 +8,7 @@ import 'package:pos_renting_v3/data/dummyData.dart';
 void main() {
   //sampledata
   initializeDummyData();
-  Tenant tenant1 = Tenant(contact: "165498",identity: 13213, rentsParking: 1,deposit: 50);
+  Tenant tenant1 = Tenant(contact: "165498",identity: "013213", rentsParking: 1,deposit: 50);
 
   system1.manageTenant(system1.roomList[0], tenant1);
   system1.manageTenant(system1.roomList[1], tenant1);

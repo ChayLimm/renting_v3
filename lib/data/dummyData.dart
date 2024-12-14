@@ -36,7 +36,7 @@ Room room6 = Room(roomName: "A006", roomPrice: 120, landlord: landlord);
 System system1 = System(roomList: roomList,priceChargeList: priceCharge);
 
 
-Tenant tenant1 = Tenant(contact: "165498", identity: 13213, rentsParking: 1, deposit: 50);
+Tenant tenant1 = Tenant(contact: "085 165 498", identity: "013213", rentsParking: 1, deposit: 50);
 
 void initializeDummyData(){
   system1.addRoom(room1, 100, 100);
