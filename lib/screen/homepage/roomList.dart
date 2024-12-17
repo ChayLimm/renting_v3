@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pos_renting_v3/data/dummyData.dart';
 import 'package:pos_renting_v3/model/payment/payment.dart';
 import 'package:pos_renting_v3/model/room/room.dart';
+import 'package:pos_renting_v3/model/system/system.dart';
 import 'package:pos_renting_v3/screen/room/main.dart';
 import 'package:pos_renting_v3/utils/device.dart';
+import 'package:provider/provider.dart';
 
 class RoomListView extends StatefulWidget {
   final List<Room> roomList;
@@ -75,7 +76,7 @@ class RoomCard extends StatelessWidget {
     final String subtitle = room.tenant?.contact ?? "None";
 
     // Check if the last payment is for the current month and year
-    final Payment? payment = system1.getPaymentThisMonth(room);
+    final Payment? payment = Provider.of<System>(context).getPaymentThisMonth(room);
 
     return Card(
       color: room.tenant != null ? payment!.status.color : Colors.grey,

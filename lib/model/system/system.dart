@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../payment/consumption.dart';
 import '../payment/payment.dart';
 import '../stakeholder/tenant.dart';
@@ -5,21 +7,22 @@ import '../room/room.dart';
 import 'pricecharge.dart';
 import 'report.dart';
 
-class System {
+class System extends ChangeNotifier  {
   List<PriceCharge> priceChargeList;
   List<Room> roomList;
 
-  // Constructor with optional parameters (defaulting to empty lists)
-  System({required this.priceChargeList,required this.roomList});
+System({List<PriceCharge>? priceChargeList, List<Room>? roomList})
+      : priceChargeList = priceChargeList ?? [],
+        roomList = roomList ?? [];
 
-
-  PriceCharge? getValidPriceCharge(DateTime datetime) {
+  PriceCharge getValidPriceCharge(DateTime datetime) {
     for(var item in priceChargeList){
       if(item.isValidDate(datetime)){
         return item;
       }
     }
-    return null;
+    //fix this later
+    return PriceCharge(electricityPrice: 0, waterPrice: 0, rentsParkingPrice: 0, finePerMonth: 0, startDate: datetime, hygieneFee: 0, fineStartOn: datetime);
   }
   Payment? getPaymentThisMonth(Room room, [DateTime? dateTime] ){
     dateTime ??= DateTime.now();
@@ -65,7 +68,11 @@ class System {
     }
 
     // If there is a tenant and previous payment, process payment for the next month
-    Consumption consumption = Consumption(waterMeter: inputWater, electricityMeter: inputElectricity);
+    Consumption consumption = 
+    Consumption(waterMeter: inputWater, 
+    electricityMeter: inputElectricity,
+    lastpayment: room.paymentList.last
+    );
 
     if (inputWater < lastPayment.consumption.waterMeter ||
         inputElectricity < lastPayment.consumption.electricityMeter) {
@@ -75,7 +82,7 @@ class System {
     }
 
     // Handle deposit update logic
-    double roomPrice = _getRoomPriceForPayment(tenant, room);
+    double roomPrice = room.roomPrice + getDepositPrice(room);
     if (tenant.deposit < room.roomPrice) {
       tenant.deposit = room.roomPrice;
     }
@@ -96,32 +103,45 @@ class System {
     );
 
     room.paymentList.add(registerPayment);
+    notifyListeners();
   }
 
 //calculate the room price considering the deposit
-  double _getRoomPriceForPayment( Tenant tenant, Room room) {
-    return tenant.deposit < room.roomPrice
-        ? room.roomPrice + (room.roomPrice - tenant.deposit)
-        : room.roomPrice;
+  double getDepositPrice(Room room) {
+    return room.tenant!.deposit < room.roomPrice
+        ? room.roomPrice - room.tenant!.deposit
+        : 0;
+  }
+  bool roomIsExist(String roomName){
+    if (roomList.any((item) => item.roomName == roomName)) {
+      print("Room name must be unique");
+      return true;
+    }
+    return false;
   }
 
-  void addRoom(Room room, double waterMeter, double electricityMeter) {
-    if (roomList.any((item) => item.roomName == room.roomName)) {
-      print("Room name must be unique");
+  void addRoom(Room room, double waterMeter, double electricityMeter,[ Tenant? tenant]) {
+    if(roomIsExist(room.roomName)){
+      print("room must be unique");
       return;
     }
     roomList.add(room);
     processPayment(room, DateTime.now(), waterMeter, electricityMeter);
+    if(tenant != null){
+      manageTenant(room, tenant);
+    }
+     notifyListeners();
   }
 
-  removeRoom(Room room) {
+  void removeRoom(Room room) {
     roomList.remove(room);
+     notifyListeners();
   }
 
 //payment list cant be update
   updateRoom(Room updateRoom) {
     for (var item in roomList) {
-      if (item.roomName == updateRoom.roomName) {
+      if (item.id == updateRoom.id) {
         item.roomPrice = updateRoom.roomPrice;
         item.roomName = updateRoom.roomName;
         item.tenant = updateRoom.tenant;
@@ -129,28 +149,33 @@ class System {
         return;
       }
     }
+    notifyListeners();
   }
 
   void updatePaymentStatus(Room room, Payment payment, PaymentStatus status) {
     for (var item in roomList) {
-      if (item.roomName == room.roomName) {
+      if (item.id == room.id) {
         for (var i = 0; i < item.paymentList.length; i++) {
           if (item.paymentList[i].timestamp == payment.timestamp) {
             item.paymentList[i].status = status; // Update the payment status
+             print("Is uppdate paymend");
+             notifyListeners();
             return; // Exit once the status is updated
           }
         }
       }
     }
     print("Payment not found");
+    notifyListeners();
   }
 
   void updatePayment(Room room, Payment newpayment) {
     for (var item in roomList) {
-      if (item.roomName == room.roomName) {
+      if (item.id == room.id) {
         for (var i = 0; i < item.paymentList.length; i++) {
           if (item.paymentList[i].timestamp == newpayment.timestamp) {
             item.paymentList[i] = newpayment; // Update the payment in the list
+             notifyListeners();
             return; // Exit once the payment is updated
           }
         }
@@ -161,21 +186,24 @@ class System {
   void manageTenant(Room room, Tenant? tenant) {
     try {
       Room foundRoom = roomList.firstWhere(
-          (item) => item.roomName == room.roomName,
+          (item) => item.id == room.id,
           orElse: () => throw Exception('Room not found'));
 
       foundRoom.tenant = tenant;
     } catch (e) {
       print(e); // Or handle the exception as needed
     }
+    notifyListeners();
   }
 
  void addPriceCharge(PriceCharge newPriceCharge) {
   if (priceChargeList.isNotEmpty) {
     priceChargeList.last.endDate = DateTime.now();
+     notifyListeners();
   }
 
   priceChargeList.add(newPriceCharge);
+   notifyListeners();
 }
 
 

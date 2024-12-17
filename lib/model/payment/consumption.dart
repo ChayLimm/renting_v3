@@ -22,8 +22,7 @@ class Consumption {
     }
 
     double waterUsed = waterMeter - lastpayment!.consumption.waterMeter;
-    double electricityUsed =
-        electricityMeter - lastpayment!.consumption.electricityMeter;
+    double electricityUsed = electricityMeter - lastpayment!.consumption.electricityMeter;
 
     return _calculateConsumption(
       waterUsed: waterUsed,

@@ -1,40 +1,62 @@
-import 'package:pos_renting_v3/model/payment/payment.dart';
-import 'package:pos_renting_v3/model/stakeholder/tenant.dart';
-import 'package:pos_renting_v3/model/system/system.dart';
-import 'screen/homepage/main.dart';
 import 'package:flutter/material.dart';
+import 'package:pos_renting_v3/model/payment/payment.dart';
+import 'package:pos_renting_v3/model/system/system.dart';
+import 'package:pos_renting_v3/model/stakeholder/tenant.dart';
 import 'package:pos_renting_v3/data/dummyData.dart';
+import 'package:provider/provider.dart';
+import 'screen/homepage/main.dart';
 
 void main() {
-  //sampledata
-  initializeDummyData();
-  Tenant tenant1 = Tenant(contact: "165498",identity: "013213", rentsParking: 1,deposit: 50);
+  // Initialize the dummy data  
+  // Create tenant instance
+  Tenant tenant1 = Tenant(contact: "165498", identity: "013213", rentsParking: 1, deposit: 50);
+  
+  // Create and manage tenants in system
+  System system = System(); // Initialize the System instance
 
-  system1.manageTenant(system1.roomList[0], tenant1);
-  system1.manageTenant(system1.roomList[1], tenant1);
-  system1.manageTenant(system1.roomList[2], tenant1);
+  system.addPriceCharge(newPriceCharge);
+  system.addRoom(room1, 100, 100);
+  system.addRoom(room2, 100, 100);
+  system.addRoom(room3, 100, 100);
+  system.addRoom(room4, 100, 100);
+  system.addRoom(room5, 100, 100);
+  system.addRoom(room6, 100, 100);
 
+  system.manageTenant(system.roomList[0], tenant1);
+  system.manageTenant(system.roomList[1], tenant1);
+  system.manageTenant(system.roomList[2], tenant1);
+  
+  // Process payments
+  system.processPayment(system.roomList[0], DateTime.now(), 200, 200);
+  system.processPayment(system.roomList[1], DateTime.now(), 200, 200);
+  system.updatePaymentStatus(system.roomList[0], system.roomList[0].paymentList.last, PaymentStatus.paid);
 
-  system1.processPayment(system1.roomList[0], DateTime.now(), 200, 200);
-  system1.processPayment(system1.roomList[1], DateTime.now(), 200, 200);
-  system1.updatePaymentStatus(system1.roomList[0],system1.roomList[0].paymentList.last,PaymentStatus.paid);
- 
-  runApp(MainApp(system: system1,));
+  // Run the app with the System instance being managed by Provider
+  runApp(MyApp(system: system));
 }
 
-class MainApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   final System system;
-  const MainApp({super.key,required this.system});
+
+  const MyApp({super.key, required this.system});
+
   @override
   Widget build(BuildContext context) {
- 
-    return  MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFFF2F2F8),
-        primaryColor: Colors.white,
+    return MultiProvider(
+      providers: [
+        // Provide System instance to the widget tree
+        ChangeNotifierProvider(
+          create: (context) => system, // Pass system instance to the provider
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          scaffoldBackgroundColor: const Color(0xFFF2F2F8),
+          primaryColor: Colors.white,
+        ),
+        home: MyHomePage(roomList: system.roomList), // Pass data to your homepage
       ),
-      home: MyHomePage(roomList: system.roomList),
     );
   }
 }

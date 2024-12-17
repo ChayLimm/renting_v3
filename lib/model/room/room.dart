@@ -1,7 +1,10 @@
 
+import 'package:uuid/uuid.dart';
+
 import '../payment/payment.dart';
 import '../stakeholder/landlord.dart';
 import '../stakeholder/tenant.dart';
+
 
 
 enum RoomAvailability{
@@ -11,18 +14,20 @@ enum RoomAvailability{
 }
 
 class Room {
+  final String? id;
   String roomName; 
   double roomPrice;
   List<Payment> paymentList = [ ];
   LandLord landlord;
   Tenant? tenant;
 
-  Room({
+    Room({
     required this.roomName, 
     required this.roomPrice, 
     required this.landlord, 
-    this.tenant, 
-    });
+    String? id, 
+    this.tenant,
+  }) : id = id ?? const Uuid().v4();
 
   RoomAvailability getRoomAvailability(){
     if(tenant == null){

@@ -1,48 +1,49 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_renting_v3/model/payment/payment.dart';
 import 'package:pos_renting_v3/model/room/room.dart';
-import 'package:pos_renting_v3/data/dummyData.dart';
-import 'package:pos_renting_v3/model/stakeholder/tenant.dart';
+import 'package:pos_renting_v3/model/system/system.dart';
+import 'package:pos_renting_v3/screen/payment/button.dart';
+import 'package:pos_renting_v3/screen/room/history.dart';
+import 'package:pos_renting_v3/screen/room/roomForm.dart';
 import 'package:pos_renting_v3/utils/component.dart';
+import 'package:provider/provider.dart';
 
-class RoomDetail extends StatefulWidget {
+class RoomDetail extends StatelessWidget {
   final Room room;
 
   const RoomDetail({super.key, required this.room});
 
   @override
-  State<RoomDetail> createState() => _RoomDetailState();
-}
-
-class _RoomDetailState extends State<RoomDetail> {
-  bool isAddorEdit = false;
-
-  void addorUpdate(Room room, Tenant tenant){
-    system1.manageTenant(room, tenant);
-    system1.updateRoom(room);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final Payment? lastPayment = system1.getPaymentThisMonth(widget.room);
-    final bool roomIsAvailable = widget.room.tenant == null;
+    final system = Provider.of<System>(context)  ;// to access the System instance
+
+    final Payment? lastPayment = system.getPaymentThisMonth(room);
+    final bool roomIsAvailable = room.tenant == null;
 
     return Scaffold(
       appBar: _buildAppBar(context),
-       floatingActionButton: FloatingActionButton(
-    onPressed: () {
-      // Action here
-    },
-    child: Icon(Icons.add),
-  ),
-      body: SingleChildScrollView(
+      floatingActionButton: roomIsAvailable ? 
+      FloatingActionButton.extended(
+        onPressed: (){
+         Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomForm(room: room,isEditingTenant:  true)));
+        },
+      backgroundColor: grey,
+      label: const Text("Register",style: TextStyle(color: Colors.white),),
+      icon: const Icon(Icons.person,color: Colors.white,),
+        )
+       : PaymentButton(room: room,),
+      
+      body: Consumer<System>(builder: (context,system,child){
+        return  SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               RoomDetailCard(
-                title: widget.room.roomName,
+                title: room.roomName,
                 trailingAction: () {},
                 children: [
                   LabelData(
@@ -56,48 +57,77 @@ class _RoomDetailState extends State<RoomDetail> {
                   ),
                   LabelData(
                     title: "Price :",
-                    data: '${widget.room.roomPrice} \$',
+                    data: '${room.roomPrice} \$',
                   ),
                   LabelData(
                     title: "Landlord :",
-                    data: widget.room.landlord.contact,
+                    data: room.landlord.contact,
                   ),
                 ],
               ),
-              if (widget.room.tenant != null)
+              if (room.tenant != null)
                 RoomDetailCard(
                   title: "Tenant",
-                  trailing: Text(DateFormat('dd MM yyyy').format(widget.room.tenant!.registerDate)),
+                  trailing: Text(DateFormat('dd MM yyyy')
+                      .format(room.tenant!.registerDate)),
                   trailingAction: () {},
                   children: [
                     LabelData(
                       title: "Identity :",
-                      data: widget.room.tenant!.identity.toString(),
+                      data: room.tenant!.identity.toString(),
                     ),
                     LabelData(
                       title: "Contact :",
-                      data: widget.room.tenant!.contact,
-                    ),LabelData(
+                      data: room.tenant!.contact,
+                    ),
+                    LabelData(
                       title: "Parking :",
-                      data: widget.room.tenant!.rentsParking.toString(),
+                      data: room.tenant!.rentsParking.toString(),
                     ),
                     LabelData(
                       title: "Deposit :",
-                      data: "${widget.room.tenant!.deposit} \$",
+                      data: "${room.tenant!.deposit} \$",
                     ),
                   ],
                 ),
-              if (widget.room.tenant == null)
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text("Room has no tenant"),
-                  ),
-                ),
+              const SizedBox(height: 10,),
+              // if (room.tenant == null)
+              //    ...[GestureDetector(
+              //     onTap: (){
+              //       Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomForm(room: room,isEditingTenant:  true)));
+              //     },
+              //     child: Padding(
+              //       padding: const EdgeInsets.all(4.0),
+              //       child: DottedBorder(
+              //         color: Colors.grey,
+              //         strokeWidth: 1,
+              //         dashPattern: [6, 6], // Longer dash and more space
+              //         borderType: BorderType.RRect,
+              //         radius: const Radius.circular(10), // Increased radius
+              //         child:  Container(
+              //           width: double.infinity,
+              //           height: 64,
+              //           decoration: BoxDecoration(
+              //             borderRadius: BorderRadius.circular(8)
+              //           ),
+              //           child: const  Center(child: Text("Add tenant",),),
+              //         ),
+              //       ),
+              //     )
+
+              //   )],
+                const SizedBox(height: 8,),
+                label("History"),
+                const SizedBox(height: 12,),
+                PaymentHistory(room: room),
             ],
           ),
         ),
-      ),
+      );
+    
+      })
+      
+     
     );
   }
 
@@ -107,16 +137,16 @@ class _RoomDetailState extends State<RoomDetail> {
       backgroundColor: Colors.white,
       actions: [
         IconButton(
-        onPressed: (){
-          setState(() {
-            isAddorEdit = !isAddorEdit;
-          });
-        }, 
-        icon: isAddorEdit? const Icon(Icons.check) : const Icon(Icons.edit)
-        )
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RoomForm(room: room)));
+            },
+            icon: const Icon(Icons.edit))
       ],
       title: Text(
-        widget.room.roomName,
+        room.roomName,
         style: const TextStyle(
           fontWeight: FontWeight.w500,
           fontSize: 18,
@@ -155,15 +185,14 @@ class RoomDetailCard extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              title: Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 24,
+                title: Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 24,
+                  ),
                 ),
-              ),
-              trailing: trailing
-            ),
+                trailing: trailing),
             Padding(
               padding: const EdgeInsets.all(8),
               child: Column(children: children),

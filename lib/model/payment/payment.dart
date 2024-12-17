@@ -42,11 +42,11 @@ class Payment {
     if (datetime.isAfter(priceCharge.fineStartOn)) {
       int fineDays = datetime.difference(priceCharge.fineStartOn).inDays;
 
-      this.fine = priceCharge.finePerMonth * fineDays;
+      fine = priceCharge.finePerMonth * fineDays;
 
       print('Fine calculated for $fineDays days: $fine');
     } else {
-      this.fine = 0.0;
+      fine = 0.0;
       print('No fine applied as the date is before the fine start date.');
     }
   }
