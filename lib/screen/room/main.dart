@@ -1,10 +1,10 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_renting_v3/model/payment/payment.dart';
 import 'package:pos_renting_v3/model/room/room.dart';
 import 'package:pos_renting_v3/model/system/system.dart';
 import 'package:pos_renting_v3/screen/payment/button.dart';
+import 'package:pos_renting_v3/screen/receipt/receipt.dart';
 import 'package:pos_renting_v3/screen/room/history.dart';
 import 'package:pos_renting_v3/screen/room/roomForm.dart';
 import 'package:pos_renting_v3/utils/component.dart';
@@ -19,7 +19,7 @@ class RoomDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final system = Provider.of<System>(context)  ;// to access the System instance
 
-    final Payment? lastPayment = system.getPaymentThisMonth(room);
+    final Payment? thisMonthPayment = system.getPaymentThisMonth(room);
     final bool roomIsAvailable = room.tenant == null;
 
     return Scaffold(
@@ -49,11 +49,11 @@ class RoomDetail extends StatelessWidget {
                   LabelData(
                     color: roomIsAvailable
                         ? Colors.grey
-                        : lastPayment?.status.color ?? Colors.black,
+                        : thisMonthPayment?.status.color ?? red,
                     title: "Status :",
                     data: roomIsAvailable
                         ? "Available"
-                        : lastPayment?.status.name ?? "N/A",
+                        : thisMonthPayment?.status.name ?? "Unpaid",
                   ),
                   LabelData(
                     title: "Price :",
@@ -65,6 +65,25 @@ class RoomDetail extends StatelessWidget {
                   ),
                 ],
               ),
+              if(thisMonthPayment != null && thisMonthPayment.status != PaymentStatus.unpaid)...[
+              GestureDetector(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: 
+                  (context)=>ReceiptPage(payment: thisMonthPayment)));
+                },
+                child: Container(
+                  height: 44,
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: thisMonthPayment!.status.color,
+                    boxShadow: [shadow()],
+                    borderRadius: BorderRadius.circular(10)
+                  ),
+                  child: const Center(
+                    child: Text("View Receipt",style: TextStyle(color: Colors.white),),
+                  ),
+                ),
+              ),],
               if (room.tenant != null)
                 RoomDetailCard(
                   title: "Tenant",
@@ -90,37 +109,12 @@ class RoomDetail extends StatelessWidget {
                     ),
                   ],
                 ),
-              const SizedBox(height: 10,),
-              // if (room.tenant == null)
-              //    ...[GestureDetector(
-              //     onTap: (){
-              //       Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomForm(room: room,isEditingTenant:  true)));
-              //     },
-              //     child: Padding(
-              //       padding: const EdgeInsets.all(4.0),
-              //       child: DottedBorder(
-              //         color: Colors.grey,
-              //         strokeWidth: 1,
-              //         dashPattern: [6, 6], // Longer dash and more space
-              //         borderType: BorderType.RRect,
-              //         radius: const Radius.circular(10), // Increased radius
-              //         child:  Container(
-              //           width: double.infinity,
-              //           height: 64,
-              //           decoration: BoxDecoration(
-              //             borderRadius: BorderRadius.circular(8)
-              //           ),
-              //           child: const  Center(child: Text("Add tenant",),),
-              //         ),
-              //       ),
-              //     )
+              const SizedBox(height: 18,),
 
-              //   )],
-                const SizedBox(height: 8,),
-                label("History"),
-                const SizedBox(height: 12,),
-                PaymentHistory(room: room),
-            ],
+              label("History"),
+              const SizedBox(height: 12,),
+              PaymentHistory(room: room),
+            ]
           ),
         ),
       );

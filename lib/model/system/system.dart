@@ -22,13 +22,13 @@ System({List<PriceCharge>? priceChargeList, List<Room>? roomList})
       }
     }
     //fix this later
-    return PriceCharge(electricityPrice: 0, waterPrice: 0, rentsParkingPrice: 0, finePerMonth: 0, startDate: datetime, hygieneFee: 0, fineStartOn: datetime);
+    return PriceCharge(electricityPrice: 0, waterPrice: 0, rentsParkingPrice: 0, finePerDay: 0, startDate: datetime, hygieneFee: 0, fineStartOn: datetime);
   }
   Payment? getPaymentThisMonth(Room room, [DateTime? dateTime] ){
     dateTime ??= DateTime.now();
     return  room.paymentList.isNotEmpty &&
             room.paymentList.last.timestamp.month == dateTime.month &&
-            room.paymentList.last.timestamp.year == dateTime.year
+            room.paymentList.last.timestamp.year == dateTime.year 
         ? room.paymentList.last
         : null;
   }
@@ -42,8 +42,7 @@ System({List<PriceCharge>? priceChargeList, List<Room>? roomList})
     }
 
     // Retrieve last payment and tenant details
-    Payment? lastPayment =
-        room.paymentList.isNotEmpty ? room.paymentList.last : null;
+    Payment? lastPayment = room.paymentList.isNotEmpty ? room.paymentList.last : null;
     Tenant? tenant = room.tenant;
 
     // Check if water and electricity meters are valid
@@ -81,17 +80,15 @@ System({List<PriceCharge>? priceChargeList, List<Room>? roomList})
       return;
     }
 
-    // Handle deposit update logic
-    double roomPrice = room.roomPrice + getDepositPrice(room);
-    if (tenant.deposit < room.roomPrice) {
-      tenant.deposit = room.roomPrice;
-    }
+    double roomPrice = room.roomPrice;
+    double deposit =  getDepositPrice(room);
+
 
     // Calculate the total price for the payment
     double consumptionTotal = consumption.getTotalConsumption(priceCharge);
     double rentingParkingTotal =
         tenant.rentsParking * priceCharge.rentsParkingPrice;
-    double totalPrice = roomPrice + consumptionTotal + rentingParkingTotal;
+    double totalPrice = roomPrice + consumptionTotal + rentingParkingTotal+ deposit;
 
     Payment registerPayment = Payment(
       status: PaymentStatus.pending,
@@ -100,6 +97,7 @@ System({List<PriceCharge>? priceChargeList, List<Room>? roomList})
       room: room,
       totalPrice: totalPrice,
       consumption: consumption,
+      deposit: deposit
     );
 
     room.paymentList.add(registerPayment);
@@ -157,16 +155,33 @@ System({List<PriceCharge>? priceChargeList, List<Room>? roomList})
       if (item.id == room.id) {
         for (var i = 0; i < item.paymentList.length; i++) {
           if (item.paymentList[i].timestamp == payment.timestamp) {
-            item.paymentList[i].status = status; // Update the payment status
+            item.paymentList[i].status = status;
+            if(status == PaymentStatus.paid){
+              if (room.tenant!.deposit < room.roomPrice) {
+                  room.tenant!.deposit = room.roomPrice;
+                }
+            }
              print("Is uppdate paymend");
              notifyListeners();
-            return; // Exit once the status is updated
+            return;
           }
         }
       }
     }
     print("Payment not found");
     notifyListeners();
+  }
+
+  void setFine(Payment payment, DateTime payOn){
+    PriceCharge priceCharge = getValidPriceCharge(payOn);
+    if(payOn.isAfter(priceCharge.fineStartOn)){
+      final dayToCharge = payOn.difference(priceCharge.fineStartOn).inDays;
+      payment.fine = dayToCharge * priceCharge.finePerDay;
+      return;
+    }else{
+      print("Paid on time");
+      return;
+    }
   }
 
   void updatePayment(Room room, Payment newpayment) {
@@ -199,7 +214,6 @@ System({List<PriceCharge>? priceChargeList, List<Room>? roomList})
  void addPriceCharge(PriceCharge newPriceCharge) {
   if (priceChargeList.isNotEmpty) {
     priceChargeList.last.endDate = DateTime.now();
-     notifyListeners();
   }
 
   priceChargeList.add(newPriceCharge);

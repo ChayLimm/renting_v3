@@ -21,6 +21,7 @@ class PaymentHistory extends StatelessWidget {
     
 
     return Container(
+      margin: EdgeInsets.only(bottom: 100),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Colors.white
@@ -30,7 +31,7 @@ class PaymentHistory extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-              color: roomIsAvailable ? Colors.grey : thisMonthPayment!.status.color,
+              color: roomIsAvailable ? Colors.grey : thisMonthPayment?.status.color ?? red,
 
               ),
               padding: const EdgeInsets.symmetric(horizontal: 14,vertical: 10),
@@ -42,7 +43,9 @@ class PaymentHistory extends StatelessWidget {
               ],),
                        ),
            
-          ...paymentList.map((toElement)=>infoTile(toElement))
+           for(int i = paymentList.length -1  ; i>=0 ;i--)...[
+            infoTile(paymentList[i]),
+          ]
 
         ],
       ),

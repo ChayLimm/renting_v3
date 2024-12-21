@@ -4,9 +4,9 @@ import 'package:pos_renting_v3/data/dummyData.dart';
 import 'package:pos_renting_v3/model/room/room.dart';
 import 'package:pos_renting_v3/model/stakeholder/tenant.dart';
 import 'package:pos_renting_v3/model/system/system.dart';
-import 'package:pos_renting_v3/screen/payment/button.dart';
 import 'package:pos_renting_v3/utils/component.dart';
 import 'package:provider/provider.dart';
+
 
 class RoomForm extends StatefulWidget {
   final Room? room;
@@ -97,7 +97,7 @@ class _RoomFormState extends State<RoomForm> {
               children: [
                 label(_isAdd ? 'Add Room' : 'Edit ${widget.room!.roomName}'),
                 const SizedBox(height: 16),
-                _buildTextFormField(
+                buildTextFormField(
                   label: "Room Name",
                   initialValue: _roomName,
                   onChanged: (value) => setState(() => _roomName = value),
@@ -110,7 +110,7 @@ class _RoomFormState extends State<RoomForm> {
                           : null : null,
                 ),
                 const SizedBox(height: 16),
-                _buildTextFormField(
+                buildTextFormField(
                   label: "Room Price",
                   initialValue: _roomPrice.toString() ,
                   onChanged: (value) =>
@@ -122,7 +122,7 @@ class _RoomFormState extends State<RoomForm> {
                 ),
                 if (_isAdd) ...[
                   const SizedBox(height: 16),
-                  _buildTextFormField(
+                  buildTextFormField(
                     label: "Electricity",
                     onChanged: (value) => setState(
                         () => _electricityMeter = double.parse(value) ?? 0),
@@ -132,7 +132,7 @@ class _RoomFormState extends State<RoomForm> {
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextFormField(
+                  buildTextFormField(
                     label: "Water",
                     onChanged: (value) =>
                         setState(() => _waterMeter = double.parse(value) ?? 0),
@@ -177,7 +177,7 @@ class _RoomFormState extends State<RoomForm> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  _buildTextFormField(
+                  buildTextFormField(
                     label: "Tenant ID",
                     initialValue: _identity,
                     onChanged: (value) => setState(() => _identity = value),
@@ -186,7 +186,7 @@ class _RoomFormState extends State<RoomForm> {
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextFormField(
+                  buildTextFormField(
                     label: "Phone Number",
                     initialValue: _contact,
                     onChanged: (value) => setState(() => _contact = value),
@@ -195,7 +195,7 @@ class _RoomFormState extends State<RoomForm> {
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextFormField(
+                  buildTextFormField(
                     label: "Vehicle",
                     initialValue: _rentsParking.toString(),
                     onChanged: (value) => setState(
@@ -206,7 +206,7 @@ class _RoomFormState extends State<RoomForm> {
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextFormField(
+                  buildTextFormField(
                     label: "Deposit",
                     initialValue: _deposit.toString(),
                     onChanged: (value) =>
@@ -220,63 +220,93 @@ class _RoomFormState extends State<RoomForm> {
                   ),
                 ],
                 const SizedBox(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Cancel"),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Room newRoom = Room(
-                            id: _isAdd ? null : widget.room!.id,
-                            roomName: _roomName,
-                            roomPrice: _roomPrice,
-                            landlord: landlord,
-                          );
-                          
-                          if (!_isAdd) {
-                            system.updateRoom(newRoom);
-                            if(isEditingTenant!){
-                               Tenant newTenant = Tenant(
-                                identity: _identity,
-                                contact: _contact,
-                                rentsParking: _rentsParking,
-                                deposit: _deposit,);
-                               system.manageTenant(newRoom, newTenant);
-                            }
-                          } else if (_isAdd) {
-                             if(isEditingTenant!){
-                               Tenant newTenant = Tenant(
-                                identity: _identity,
-                                contact: _contact,
-                                rentsParking: _rentsParking,
-                                deposit: _deposit,);
-                                system.addRoom(newRoom, _waterMeter, _electricityMeter,newTenant);
+               Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+      },
+      child: Container(
+        height: 44,
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          border: Border.all(width: 1, color: blue),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child:  Center(
+          child: Text(
+            "Cancel",
+            style: TextStyle(color: blue),
+          ),
+        ),
+      ),
+    ),
+    GestureDetector(
+      onTap: () {
+        if (_formKey.currentState!.validate()) {
+          Room newRoom = Room(
+            id: _isAdd ? null : widget.room!.id,
+            roomName: _roomName,
+            roomPrice: _roomPrice,
+            landlord: landlord,
+          );
 
-                            }else{
-                            system.addRoom(newRoom, _waterMeter, _electricityMeter);}
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Update completed successfully!'),
-                              backgroundColor: Colors.green,
-                              behavior: SnackBarBehavior.floating,
-                              margin: EdgeInsets.all(16),
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                          Navigator.pop(context);
-                        }
-                      },
-                      child:  Text(_isAdd ?"Add Room" :'Update Room'),
-                    ),
-                  ],
-                ),
+          if (!_isAdd) {
+            system.updateRoom(newRoom);
+            if (isEditingTenant!) {
+              Tenant newTenant = Tenant(
+                identity: _identity,
+                contact: _contact,
+                rentsParking: _rentsParking,
+                deposit: _deposit,
+              );
+              system.manageTenant(newRoom, newTenant);
+            }
+          } else {
+            if (isEditingTenant!) {
+              Tenant newTenant = Tenant(
+                identity: _identity,
+                contact: _contact,
+                rentsParking: _rentsParking,
+                deposit: _deposit,
+              );
+              system.addRoom(newRoom, _waterMeter, _electricityMeter, newTenant);
+            } else {
+              system.addRoom(newRoom, _waterMeter, _electricityMeter);
+            }
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Update completed successfully!'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.all(16),
+              duration: Duration(seconds: 3),
+            ),
+          );
+          Navigator.pop(context);
+        }
+      },
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: blue,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Center(
+          child: Text(
+            "Submit",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+    ),
+  ],
+)
+
               ],
             ),
           ),
@@ -285,25 +315,5 @@ class _RoomFormState extends State<RoomForm> {
     );
   }
 
-  TextFormField _buildTextFormField({
-    required String label,
-     String? initialValue,
-    required Function(String) onChanged,
-    required String? Function(String?) validator,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return TextFormField(
-      initialValue: initialValue,
-      onChanged: onChanged,
-      validator: validator,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.blue, width: 2.0),
-        ),
-      ),
-    );
-  }
+ 
 }

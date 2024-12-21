@@ -23,6 +23,7 @@ class Payment {
   final LandLord landlord;
   final Room room;
   double fine;
+  double deposit;
   final double totalPrice;
   final Consumption consumption;
 
@@ -32,6 +33,7 @@ class Payment {
     required this.landlord, 
     required this.room, 
     this.fine = 0.00,
+    this.deposit =0.00,
     required this.totalPrice, 
     required this.consumption
     }
@@ -42,7 +44,7 @@ class Payment {
     if (datetime.isAfter(priceCharge.fineStartOn)) {
       int fineDays = datetime.difference(priceCharge.fineStartOn).inDays;
 
-      fine = priceCharge.finePerMonth * fineDays;
+      fine = priceCharge.finePerDay * fineDays;
 
       print('Fine calculated for $fineDays days: $fine');
     } else {

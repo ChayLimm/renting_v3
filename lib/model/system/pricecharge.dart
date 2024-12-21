@@ -2,7 +2,7 @@ class PriceCharge {
   final double electricityPrice;
   final double waterPrice;
   final double hygieneFee;
-  final double finePerMonth;
+  final double finePerDay;
   final DateTime fineStartOn;
   final double rentsParkingPrice;
   final DateTime startDate;
@@ -11,7 +11,7 @@ class PriceCharge {
     required this.electricityPrice,
     required this.waterPrice,
     required this.rentsParkingPrice,
-    required this.finePerMonth,
+    required this.finePerDay,
     required this.startDate,
     required this.hygieneFee,
     required this.fineStartOn,

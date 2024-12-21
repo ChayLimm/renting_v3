@@ -15,7 +15,7 @@ PriceCharge(
   electricityPrice: 0.5, 
   waterPrice: 0.35, 
   rentsParkingPrice: 10, 
-  finePerMonth: 3, 
+  finePerDay: 3, 
   startDate: DateTime(2024, 11, 11), 
   hygieneFee: 1, 
   fineStartOn: DateTime(DateTime.now().year, DateTime.now().month, 5) 
@@ -35,7 +35,12 @@ Room room6 = Room(roomName: "A006", roomPrice: 120, landlord: landlord);
 // System system1 = System();
 
 
-Tenant tenant1 = Tenant(contact: "085 165 498", identity: "013213", rentsParking: 1, deposit: 50);
+Tenant tenant1 = Tenant(contact: "085 165 498", identity: "134124", rentsParking: 0, deposit: 50);
+Tenant tenant2 = Tenant(contact: "085 165 498", identity: "432434", rentsParking: 1, deposit: 80);
+Tenant tenant3 = Tenant(contact: "085 165 498", identity: "678", rentsParking: 0, deposit: 30);
+Tenant tenant4 = Tenant(contact: "085 165 498", identity: "5432", rentsParking: 2, deposit: 10);
+Tenant tenant5 = Tenant(contact: "085 165 498", identity: "47653", rentsParking: 0, deposit: 50);
+Tenant tenant6 = Tenant(contact: "085 165 498", identity: "65347876", rentsParking: 1, deposit: 120);
 
 // void initializeDummyData(){
 //   system1.addPriceCharge(newPriceCharge);

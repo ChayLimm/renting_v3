@@ -3,6 +3,7 @@ import 'package:pos_renting_v3/model/payment/payment.dart';
 import 'package:pos_renting_v3/model/system/system.dart';
 import 'package:pos_renting_v3/model/stakeholder/tenant.dart';
 import 'package:pos_renting_v3/data/dummyData.dart';
+import 'package:pos_renting_v3/screen/main.dart';
 import 'package:provider/provider.dart';
 import 'screen/homepage/main.dart';
 
@@ -23,8 +24,8 @@ void main() {
   system.addRoom(room6, 100, 100);
 
   system.manageTenant(system.roomList[0], tenant1);
-  system.manageTenant(system.roomList[1], tenant1);
-  system.manageTenant(system.roomList[2], tenant1);
+  system.manageTenant(system.roomList[1], tenant2);
+  system.manageTenant(system.roomList[2], tenant3);
   
   // Process payments
   system.processPayment(system.roomList[0], DateTime.now(), 200, 200);
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: const Color(0xFFF2F2F8),
           primaryColor: Colors.white,
         ),
-        home: MyHomePage(roomList: system.roomList), // Pass data to your homepage
+        home: AppController(system: system), // Pass data to your homepage
       ),
     );
   }

@@ -22,6 +22,7 @@ class _RoomListViewState extends State<RoomListView> {
     super.initState();
     _resetAnimation();
   }
+  
 
   @override
   void didUpdateWidget(RoomListView oldWidget) {
